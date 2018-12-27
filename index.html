@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>Parallax scroll & auto-alligned element height</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="pimg1">
+			<div class="ptext">
+				<div class="border">Parallax scroll & auto-alligned element height</div>
+			</div>
+		</div>
+		<section class="section section-light">
+			<h2>Section one</h2>
+			<p>
+				Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptatibus possimus non suscipit
+				odio ab. A facilis natus quisquam iusto asperiores sed itaque dolores repudiandae tenetur,
+				ut laudantium ipsam, aperiam quos libero ipsa veritatis, cumque nulla neque repellat modi
+				ipsum aliquid! Dolorum suscipit reprehenderit laborum eius quis explicabo obcaecati modi
+				deleniti, at quaerat sit eaque, reiciendis delectus nobis quasi blanditiis hic quidem eum
+				ullam laboriosam aliquid perspiciatis illo ipsa enim. Neque praesentium est maiores
+				reprehenderit. Vitae exercitationem facere inventore, reiciendis maxime tenetur ipsam
+				quisquam. Ducimus sapiente laboriosam id, doloremque doloribus repellendus autem accusantium
+				quam aspernatur, eligendi cumque ad velit, blanditiis vero.
+			</p>
+		</section>
+
+		<div class="pimg2">
+			<div class="ptext"><span class="border trans">Some sweet, meaningful text</span></div>
+		</div>
+		<section class="section section-dark">
+			<h2>Section two</h2>
+			<p>
+				Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptatibus possimus non suscipit
+				odio ab. A facilis natus quisquam iusto asperiores sed itaque dolores repudiandae tenetur,
+				ut laudantium ipsam, aperiam quos libero ipsa veritatis, cumque nulla neque repellat modi
+				ipsum aliquid! Dolorum suscipit reprehenderit laborum eius quis explicabo obcaecati modi
+				deleniti, at quaerat sit eaque, rei<...>. Ducimus sapiente laboriosam id, doloremque
+				doloribus repellendus autem accusantium quam aspernatur, eligendi cumque ad velit,
+				blanditiis vero.
+			</p>
+		</section>
+
+		<div class="pimg3">
+			<div class="ptext"><span class="border trans">Even more amazing text</span></div>
+		</div>
+		<section class="section section-dark">
+			<h2>Section three</h2>
+			<p>
+				Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt reprehenderit accusamus
+				sequi laudantium aliquid? Exercitationem accusamus tempora at esse minima. Ullam, ipsam.
+				Sunt dolorem dicta dignissimos quaerat blanditiis aperiam aliquid alias accusantium facilis
+				sint vel dolor facere delectus, aspernatur libero sapiente exercitationem quos mollitia
+				dolore fugiat excepturi praesentium modi harum? Ex dolor accusantium modi necessitatibus
+				eligendi, minima a! Optio, dignissimos tempore nesciunt facere possimus soluta dolorum ipsam
+				rem obcaecati.
+			</p>
+		</section>
+
+		<div class="pimg1">
+			<div class="ptext"><span class="border">Oh hey look - it's me again!</span></div>
+		</div>
+	</body>
+	<script>
+		/**
+		 * @function allignElements
+		 * @desc dynamically set the height of `ptext` elements (completely center them)
+		 *
+		 * `element.clientHeight` vs `element.offsetHeight`:
+		 * https://developer.mozilla.org/en-US/docs/Web/API/Element/clientHeight
+		 * https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight
+		 */
+		const allignElements = () => {
+			let ptexts = document.querySelectorAll(".ptext");
+			const halfDocumentHeight = document.body.offsetHeight / 2;
+
+			ptexts.forEach((ptext) => {
+				const styles = window.getComputedStyle(ptext);
+				let height =
+					ptext.offsetHeight + parseFloat(styles.marginTop) + parseFloat(styles.marginBottom);
+
+				let top = halfDocumentHeight - height / 2;
+				let topPercent = (top / document.body.offsetHeight) * 100;
+				ptext.style.top = (topPercent + "%").toString();
+
+				console.log(
+					"height",
+					height,
+					"offsetHeight",
+					document.body.offsetHeight,
+					"top",
+					top,
+					"ptext.style.top (%)",
+					ptext.style.top
+				);
+			});
+		};
+
+		allignElements();
+
+		/** handle resizing: */
+
+		let busy = false;
+		let calledAgain = false;
+		const howLongToThrottle = 66; /** every 15fps, apparently */
+
+		const resizeThrottler = () => {
+			if (!busy) {
+				busy = true;
+				calledAgain = false;
+				allignElements();
+
+				/**
+				 * `setTimeout` prevents `allignElements` calls for `howLongToThrottle` miliseconds.
+				 * if another resize event happened, we'll resize after the timeout (using `calledAgain`).
+				 */
+				setTimeout(() => {
+					busy = false;
+					if (calledAgain) {
+						allignElements();
+					}
+					calledAgain = false;
+				}, howLongToThrottle);
+			} else {
+				calledAgain = true;
+			}
+		};
+
+		/**
+		 * `resize` docs: https://developer.mozilla.org/en-US/docs/Web/Events/resize
+		 */
+		window.addEventListener("resize", resizeThrottler, false);
+	</script>
+</html>
